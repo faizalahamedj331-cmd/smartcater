@@ -132,8 +132,7 @@ python manage.py migrate
 
 ### Step 6: Create Superuser
 
-```
-bash
+```bash
 python manage.py createsuperuser
 ```
 
