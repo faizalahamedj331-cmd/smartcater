@@ -1,0 +1,18 @@
+# SmartCater - Catering Management System
+# Django Project Dependencies
+
+# Django Framework
+Django>=4.2,<5.0
+
+# Database
+mysqlclient>=2.1.0
+
+# Crispy Forms for Bootstrap 5
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.7
+
+# Pillow for image handling
+Pillow>=9.0.0
+
+# python-dotenv for environment variables
+python-dotenv>=1.0.0

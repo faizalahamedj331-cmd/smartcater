@@ -1,0 +1,115 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Caterer Dashboard - SmartCater{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Caterer Dashboard</h2>
+    
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h2>{{ pending_bookings }}</h2>
+                    <p>Pending Bookings</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h2>{{ confirmed_bookings }}</h2>
+                    <p>Confirmed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-dark">
+                <div class="card-body">
+                    <h2>{{ completed_bookings }}</h2>
+                    <p>Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h2>${{ total_revenue }}</h2>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-plus-circle display-4 text-primary"></i>
+                    <h5 class="mt-3">Add Menu Item</h5>
+                    <a href="{% url 'add_menu_item' %}" class="btn btn-primary">Add New</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-list-menu display-4 text-primary"></i>
+                    <h5 class="mt-3">Manage Menu</h5>
+                    <a href="{% url 'caterer_menu' %}" class="btn btn-primary">View Menu</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-check display-4 text-primary"></i>
+                    <h5 class="mt-3">View Bookings</h5>
+                    <a href="{% url 'catering_bookings' %}" class="btn btn-primary">All Bookings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Bookings -->
+    <h3 class="mb-3">Recent Bookings</h3>
+    {% if recent_bookings %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Event</th>
+                        <th>Date</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in recent_bookings %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>{{ booking.customer.username }}</td>
+                        <td>{{ booking.event_name }}</td>
+                        <td>{{ booking.event_date }}</td>
+                        <td>{{ booking.number_of_guests }}</td>
+                        <td>
+                            <span class="badge bg-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">No bookings yet.</div>
+    {% endif %}
+</div>
+{% endblock %}

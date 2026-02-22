@@ -1,0 +1,69 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}My Bookings - SmartCater{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">My Bookings</h2>
+    
+    <!-- Filter -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <select name="status" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Bookings List -->
+    {% if bookings %}
+        {% for booking in bookings %}
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5>Booking #{{ booking.id }} - {{ booking.event_name }}</h5>
+                        <p class="mb-1">
+                            <strong>Caterer:</strong> {{ booking.caterer.company_name }}
+                        </p>
+                        <p class="mb-1">
+                            <strong>Date:</strong> {{ booking.event_date }} at {{ booking.event_time }}
+                        </p>
+                        <p class="mb-1">
+                            <strong>Guests:</strong> {{ booking.number_of_guests }}
+                        </p>
+                        <p class="mb-0">
+                            <strong>Total:</strong> ${{ booking.total_amount }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <span class="badge bg-{{ booking.status }} mb-2">{{ booking.get_status_display }}</span>
+                        <br>
+                        <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        {% if booking.status == 'pending' %}
+                            <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                        {% endif %}
+                        {% if booking.status == 'completed' and not booking.review %}
+                            <a href="{% url 'submit_review' booking.id %}" class="btn btn-sm btn-outline-success">Review</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">No bookings found.</div>
+    {% endif %}
+</div>
+{% endblock %}

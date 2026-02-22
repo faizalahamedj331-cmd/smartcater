@@ -1,0 +1,114 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Booking Details - SmartCater{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Booking Details #{{ booking.id }}</h2>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Booking Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Event Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Event Name:</strong> {{ booking.event_name }}</p>
+                            <p><strong>Event Date:</strong> {{ booking.event_date }}</p>
+                            <p><strong>Event Time:</strong> {{ booking.event_time }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Location:</strong> {{ booking.location }}</p>
+                            <p><strong>Number of Guests:</strong> {{ booking.number_of_guests }}</p>
+                            <p><strong>Status:</strong> <span class="badge bg-{{ booking.status }}">{{ booking.get_status_display }}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Menu Items -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Menu Items</h5>
+                </div>
+                <div class="card-body">
+                    {% if booking.items.all %}
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in booking.items.all %}
+                                <tr>
+                                    <td>{{ item.menu_item.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.unit_price }}</td>
+                                    <td>${{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No menu items selected.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Special Requests -->
+            {% if booking.special_requests %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Special Requests</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ booking.special_requests }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Summary -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Price per Person:</strong> ${{ booking.total_amount }}</p>
+                    <p><strong>Number of Guests:</strong> {{ booking.number_of_guests }}</p>
+                    <hr>
+                    <h4>Total: ${{ booking.total_cost }}</h4>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            {% if request.user.is_customer and booking.status == 'pending' %}
+            <div class="mt-3">
+                <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-danger w-100">Cancel Booking</a>
+            </div>
+            {% endif %}
+            
+            {% if request.user.is_caterer and booking.status == 'pending' %}
+            <div class="mt-3">
+                <a href="{% url 'confirm_booking' booking.id %}" class="btn btn-success w-100 mb-2">Confirm</a>
+                <a href="{% url 'cancel_booking' booking.id %}" class="btn btn-danger w-100">Reject</a>
+            </div>
+            {% endif %}
+            
+            {% if request.user.is_caterer and booking.status == 'confirmed' %}
+            <div class="mt-3">
+                <a href="{% url 'complete_booking' booking.id %}" class="btn btn-primary w-100">Mark as Completed</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

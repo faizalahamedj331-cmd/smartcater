@@ -1,0 +1,153 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Profile - SmartCater{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="Profile" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <i class="bi bi-person-circle" style="font-size: 6rem; color: #6c757d;"></i>
+                    {% endif %}
+                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+                    <p class="text-muted">{{ user.get_role_display }}</p>
+                    <p class="text-muted">{{ user.email }}</p>
+                    <a href="{% url 'profile_edit' %}" class="btn btn-primary">
+                        <i class="bi bi-pencil"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+            
+            {% if user.is_caterer and caterer_profile %}
+            <div class="card shadow mt-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Caterer Information</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Company:</strong> {{ caterer_profile.company_name }}</p>
+                    <p><strong>Service Area:</strong> {{ caterer_profile.service_area|default:"Not specified" }}</p>
+                    <p><strong>Rating:</strong> 
+                        {% if caterer_profile.rating > 0 %}
+                            <span class="text-warning">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= caterer_profile.rating|floatformat:0 %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            {{ caterer_profile.rating }}
+                        {% else %}
+                            No ratings yet
+                        {% endif %}
+                    </p>
+                    <p><strong>Total Bookings:</strong> {{ caterer_profile.total_bookings }}</p>
+                    <p><strong>Verified:</strong> 
+                        {% if caterer_profile.is_verified %}
+                            <span class="badge bg-success">Verified</span>
+                        {% else %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'caterer_profile_edit' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil"></i> Edit Caterer Info
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Account Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <strong>Username:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.username }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <strong>Email:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.email }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <strong>Phone:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.phone|default:"Not provided" }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <strong>Address:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.address|default:"Not provided" }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3">
+                            <strong>Member Since:</strong>
+                        </div>
+                        <div class="col-sm-9">
+                            {{ user.date_joined|date:"F d, Y" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if user.is_customer and bookings %}
+            <div class="card shadow mt-3">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Caterer</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for booking in bookings|slice:":5" %}
+                                <tr>
+                                    <td>#{{ booking.id }}</td>
+                                    <td>{{ booking.caterer.company_name }}</td>
+                                    <td>{{ booking.event_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ booking.status|default:'secondary' }}">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <a href="{% url 'my_bookings' %}" class="btn btn-outline-primary btn-sm">View All Bookings</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

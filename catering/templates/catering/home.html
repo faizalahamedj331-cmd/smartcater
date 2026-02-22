@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - SmartCater{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">Welcome to SmartCater</h1>
+                <p class="lead text-muted">Your trusted platform for finding the best catering services for your events.</p>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-lg me-2">Get Started</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+                {% else %}
+                    {% if user.is_customer %}
+                        <a href="{% url 'caterer_list' %}" class="btn btn-primary btn-lg">Browse Caterers</a>
+                    {% elif user.is_caterer %}
+                        <a href="{% url 'caterer_dashboard' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-cup-hot-fill" style="font-size: 8rem; color: #0d6efd;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose SmartCater Section -->
+<div class="container py-5">
+    <div class="text-center mb-4">
+        <h2>Why Choose SmartCater?</h2>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-people display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">Professional Caterers</h5>
+                    <p class="card-text text-muted">Connect with verified and professional catering services.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-check display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">Easy Booking</h5>
+                    <p class="card-text text-muted">Simple and quick booking process for your events.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-star display-4 text-primary mb-3"></i>
+                    <h5 class="card-title">Reviews & Ratings</h5>
+                    <p class="card-text text-muted">Make informed decisions with real reviews.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h2 class="display-4">{{ total_caterers }}</h2>
+                <p>Verified Caterers</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4">{{ total_bookings }}</h2>
+                <p>Successful Bookings</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4">100%</h2>
+                <p>Customer Satisfaction</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Caterers -->
+{% if featured_caterers %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Featured Caterers</h2>
+    <div class="row g-4">
+        {% for caterer in featured_caterers %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ caterer.company_name }}</h5>
+                    <p class="card-text text-muted">{{ caterer.description|truncatewords:20 }}</p>
+                    <p>
+                        {% if caterer.is_verified %}
+                        <span class="badge bg-success">Verified</span>
+                        {% endif %}
+                        <span class="badge bg-primary">{{ caterer.total_bookings }} Bookings</span>
+                    </p>
+                    <a href="{% url 'caterer_detail' caterer.id %}" class="btn btn-outline-primary">View Menu</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+        <a href="{% url 'caterer_list' %}" class="btn btn-primary">View All Caterers</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Categories -->
+{% if categories %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Menu Categories</h2>
+    <div class="row g-4">
+        {% for category in categories %}
+        <div class="col-md-3 col-sm-6">
+            <div class="card h-100 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-grid display-5 text-primary mb-2"></i>
+                    <h6>{{ category.name }}</h6>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- CTA Section -->
+{% if not user.is_authenticated %}
+<div class="container py-5 text-center">
+    <div class="card bg-primary text-white">
+        <div class="card-body py-5">
+            <h2>Ready to Get Started?</h2>
+            <p class="lead">Join SmartCater today and find the perfect caterer for your event.</p>
+            <a href="{% url 'register' %}" class="btn btn-light btn-lg">Sign Up Now</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

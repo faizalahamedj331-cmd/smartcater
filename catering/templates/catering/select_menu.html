@@ -1,0 +1,105 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Select Menu - SmartCater{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Select Menu Items</h2>
+    
+    <!-- Booking Summary -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Event:</strong> {{ booking.event_name }}</p>
+                    <p><strong>Date:</strong> {{ booking.event_date }}</p>
+                    <p><strong>Guests:</strong> {{ booking.number_of_guests }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h4>Total: ${{ total|floatformat:2 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Menu Items -->
+    {% if menu_items %}
+    <form method="POST" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" name="menu_item_id" id="selectedMenuItemId" value="">
+        
+        <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label" for="menuItemSelect">Choose Item</label>
+                <select name="menu_item_id" id="menuItemSelect" class="form-select" required>
+                    <option value="" selected disabled>Choose an item</option>
+                    {% for item in menu_items %}
+                        <option value="{{ item.id }}">{{ item.name }} - ${{ item.price }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="quantityInput">Quantity</label>
+                <input type="number" name="quantity" id="quantityInput" class="form-control" min="1" value="1">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Add to Booking</button>
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="alert alert-info">No menu items available from this caterer.</div>
+    {% endif %}
+
+    <!-- Selected Items -->
+    {% if selected_items %}
+    <div class="card mt-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Your Selected Items</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in selected_items %}
+                        <tr>
+                            <td><strong>{{ item.menu_item.name }}</strong></td>
+                            <td>${{ item.unit_price|floatformat:2 }}</td>
+                            <td>x{{ item.quantity }}</td>
+                            <td>${{ item.subtotal|floatformat:2 }}</td>
+                            <td>
+                                <a href="{% url 'remove_booking_item' item.id %}" class="btn btn-sm btn-danger">Remove</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-4">No items added yet.</div>
+    {% endif %}
+
+    <!-- Confirm Section -->
+    {% if selected_items %}
+    <div class="text-center mt-5">
+        <hr>
+        <h4>Total Due: ${{ booking.total_cost|floatformat:2 }}</h4>
+        <div class="mt-3">
+            <a href="{% url 'confirm_booking' booking.id %}" class="btn btn-success btn-lg">Confirm and Place Booking</a>
+            <a href="{% url 'my_bookings' %}" class="btn btn-secondary btn-lg">Cancel</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

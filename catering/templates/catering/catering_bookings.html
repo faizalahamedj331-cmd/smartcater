@@ -1,0 +1,72 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}All Bookings - SmartCater{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">All Bookings</h2>
+    
+    <!-- Filter -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <select name="status" class="form-select" title="Filter by status">
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="search" class="form-control" placeholder="Search by event">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bookings Table -->
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Guests</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>#{{ booking.id }}</td>
+                    <td>{{ booking.customer.username }}</td>
+                    <td>{{ booking.event_name }}</td>
+                    <td>{{ booking.event_date }}</td>
+                    <td>{{ booking.number_of_guests }}</td>
+                    <td>${{ booking.total_cost }}</td>
+                    <td>
+                        <span class="badge bg-{{ booking.status }}">{{ booking.get_status_display }}</span>
+                    </td>
+                    <td>
+                        <a href="{% url 'booking_detail' booking.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No bookings found.</div>
+    {% endif %}
+</div>
+{% endblock %}
